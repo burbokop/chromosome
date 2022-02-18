@@ -12,7 +12,6 @@ impl<T> Chromosome<T> {
     pub fn new(genes: Vec<T>) -> Self {
         Chromosome { genes }
     }
-
 }
 
 
@@ -62,7 +61,3 @@ impl<T: std::fmt::Display> std::fmt::Display for Chromosome<T> {
     }
 }
 
-// rust-analyzer failed to load workspace: Failed to find sysroot for Cargo.toml file /home/boris/projects/rust/genetics/Cargo.toml. Is rust-src installed?: can't load standard library from sysroot
-// /usr
-// (discovered via `rustc --print sysroot`)
-// try installing the Rust source the same way you installed rustc

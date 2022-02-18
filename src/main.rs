@@ -1,20 +1,12 @@
-use std::time::SystemTime;
-
-use rand::prelude::StdRng;
-
-
 
 mod chromosome;
-
+mod selector;
 
 fn main() {
     let c0 = chromosome::Chromosome::new(vec![2, 2, 5, 8]);
 
     let c1 = chromosome::Chromosome::new(vec![1, 5, 4, 3]);
 
-    let d = SystemTime::now()
-        .duration_since(SystemTime::UNIX_EPOCH)
-        .expect("Duration since UNIX_EPOCH failed");
 
     let mut rng = rand::rngs::OsRng::default();
 
