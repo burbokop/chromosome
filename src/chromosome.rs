@@ -1,6 +1,6 @@
 
 
-use std::default::Default;
+use std::{default::Default, ops::Add, ops::Sub};
 use rand::Rng;
 
 #[derive(Default, Clone)]
@@ -15,8 +15,9 @@ impl<T> Chromosome<T> {
 
 }
 
+
 impl<T: Clone> Chromosome<T> {
-    pub fn recombine_with(self: &Chromosome<T>, that: &Chromosome<T>, point: usize) -> (Chromosome<T>, Chromosome<T>) {
+    pub fn recombined_with(self: &Chromosome<T>, that: &Chromosome<T>, point: usize) -> (Chromosome<T>, Chromosome<T>) {
         if point < self.genes.len() && point < that.genes.len() {
             (
                 Chromosome::new(self.genes[..point].iter().cloned().chain(that.genes[point..].iter().cloned()).collect()),
@@ -28,13 +29,21 @@ impl<T: Clone> Chromosome<T> {
         }
     }
 
-    pub fn recombine_random_with(self: &Chromosome<T>, that: &Chromosome<T>) -> (Chromosome<T>, Chromosome<T>) {
-        let r = rand::thread_rng();
-        r.
-
-        self.recombine_With(that, RandGeg.int.generate(0, Math.min(genes.length, that.genes.length) - 1))
+    pub fn recombined_random_with<R : rand::RngCore>(self: &Chromosome<T>, that: &Chromosome<T>, rng: &mut R) -> (Chromosome<T>, Chromosome<T>) {
+        self.recombined_with(that, rng.gen_range(0..(std::cmp::min(self.genes.len(), that.genes.len()) - 1)))
     }
 
+}
+
+impl <T: Add<Output=T> + Sub<Output=T> + Clone> Chromosome<T> {
+    pub fn mutated<R : rand::RngCore>(self: &Chromosome<T>, delta: T, chance: f64, rng: &mut R) -> Chromosome<T> {
+        Chromosome::new(self.genes.iter().cloned().map(
+            |gene| 
+                if rng.gen_bool(chance) {
+                    if rng.gen_bool(0.5) { gene + delta.clone() } else { gene - delta.clone() }
+                } else { gene }
+        ).collect())
+    }
 }
 
 
