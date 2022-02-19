@@ -3,7 +3,7 @@ use rand::Rng;
 
 use crate::chromosome::Chromosome;
 
-pub fn invert_normalize<T, I: Iterator<Item=T>>(values: I) -> impl Iterator<Item=f64>
+fn invert_normalize<T, I: Iterator<Item=T>>(values: I) -> impl Iterator<Item=f64>
     where 
     T: Into<f64> + Clone,
     I: Clone {
@@ -13,7 +13,7 @@ pub fn invert_normalize<T, I: Iterator<Item=T>>(values: I) -> impl Iterator<Item
     coefficients.map(move |v| v / sum)
 }
 
-pub fn cascade_sum(vec: Vec<f64>) -> Vec<f64> {
+fn cascade_sum(vec: Vec<f64>) -> Vec<f64> {
     let mut sum: f64 = 0.;
     let mut result = Vec::with_capacity(vec.len());
     for i in vec {
@@ -21,6 +21,20 @@ pub fn cascade_sum(vec: Vec<f64>) -> Vec<f64> {
         sum += i;
     }
     return result;
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn invert_normalize_test() {
+        use crate::selector::invert_normalize;
+        assert_eq!(invert_normalize(vec![2, 4, 8, 8].into_iter()).collect::<Vec<_>>(), vec![0.5, 0.25, 0.125, 0.125]);
+    }
+    #[test]
+    fn cascade_sum_test() {
+        use crate::selector::cascade_sum;
+        assert_eq!(cascade_sum(vec![0.5, 0.1, 0.4]), vec![0.5, 0.6, 1.0])
+    }
 }
 
 pub trait Selector<T> {

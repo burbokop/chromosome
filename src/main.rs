@@ -1,13 +1,9 @@
 use std::iter::Sum;
 
-use selector::Fitness;
 
-use crate::selector::{Selector, FitnessSelector};
-
+use genetic::{Chromosome, Selector, FitnessSelector, Fitness};
 
 
-mod chromosome;
-mod selector;
 
 struct TestFitness {
 
@@ -18,15 +14,15 @@ impl TestFitness {
 }
 
 impl<T: Sum + Clone> Fitness<T> for TestFitness {
-    fn fitness_value(self: &Self, chromosome: &chromosome::Chromosome<T>) -> T {
+    fn fitness_value(self: &Self, chromosome: &Chromosome<T>) -> T {
         chromosome.genes.iter().cloned().sum()
     }
 }
 
 fn main() {
-    let c0 = chromosome::Chromosome::new(vec![2, 2, 5, 8]);
+    let c0 = Chromosome::new(vec![2, 2, 5, 8]);
 
-    let c1 = chromosome::Chromosome::new(vec![1, 5, 4, 3]);
+    let c1 = Chromosome::new(vec![1, 5, 4, 3]);
 
     let mut rng = rand::rngs::OsRng::default();
 
