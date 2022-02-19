@@ -5,7 +5,7 @@ use rand::Rng;
 
 #[derive(Default, Clone)]
 pub struct Chromosome<T> {
-    genes: Vec<T> 
+    pub genes: Vec<T> 
 }
 
 impl<T> Chromosome<T> {
