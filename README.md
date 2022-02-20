@@ -1,1 +1,2 @@
-# genetic
+# Chromosome
+Genetic algorithms tools library
