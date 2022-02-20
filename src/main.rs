@@ -1,23 +1,29 @@
-use std::iter::Sum;
+use std::{iter::Sum, ops::{Mul, Sub}};
 
 
-use chromosome::{Chromosome, Selector, FitnessSelector, Fitness};
+use chromosome::{Chromosome, Selector, Fitness, SelectorFactory};
 
 
-
-struct TestFitness {
-
+struct DiophantusEquation<'a, 'b, T> {
+    coefficients: &'a Vec<T>, 
+    result: &'b T
 }
 
-impl TestFitness {
-    fn new() -> Self { TestFitness {  } }
-}
-
-impl<T: Sum + Clone> Fitness<T> for TestFitness {
-    fn fitness_value(self: &Self, chromosome: &Chromosome<T>) -> T {
-        chromosome.genes.iter().cloned().sum()
+impl<'a, 'b, T> DiophantusEquation<'a, 'b, T> {
+    fn new(coefficients: &'a Vec<T>, result: &'b T) -> Self {
+        DiophantusEquation { coefficients: coefficients, result: result }
     }
 }
+
+impl<'a, 'b, T: Mul<Output = T> + Sum + Sub<Output = T> + Clone> Fitness for DiophantusEquation<'a, 'b, T> {
+    type Value = T;
+    fn fitness(self: &Self, chromosome: &Chromosome<T>) -> T {
+        (0..usize::min(self.coefficients.len(), chromosome.genes.len()))
+            .map(|i| self.coefficients[i].clone() * chromosome.genes[i].clone())
+            .sum::<T>() - self.result.clone()
+  }
+}
+
 
 fn main() {
     let c0 = Chromosome::new(vec![2, 2, 5, 8]);
@@ -26,9 +32,10 @@ fn main() {
 
     let mut rng = rand::rngs::OsRng::default();
 
-    let rc = FitnessSelector::from_fitness(&TestFitness::new()).select_chromosome(&vec![c0.clone(), c1.clone()], &mut rng);
+    let rc = DiophantusEquation::new(&vec![2, 23, 54], &2)
+        .selector()
+        .select_chromosome(&vec![c0.clone(), c1.clone()], &mut rng);
 
-    //TestFitness::new().selector().select_chromosome(&vec![c0, c1]);
 
     println!("Hello, world0! {}", c0);
     println!("Hello, world1! {}", c1);

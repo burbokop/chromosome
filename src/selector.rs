@@ -41,9 +41,21 @@ pub trait Selector<T> {
     fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Chromosome<T>;
 }
 
-pub trait Fitness<T> {
-    fn fitness_value(self: &Self, chromosome: &Chromosome<T>) -> T;
-    fn selector(self: &Self) -> FitnessSelector<Self> where Self: Sized { FitnessSelector { fitness: self } }
+/// Fitness trait provides interface for finging fitness value for chromosome
+/// 
+/// fitness value - the smaller it is, the closer the chromosome is to the ideal (more adapted). if 0 is an ideal chromosome (solution of the problem)
+/// 
+pub trait Fitness {
+    type Value;
+    fn fitness(self: &Self, chromosome: &Chromosome<Self::Value>) -> Self::Value;
+}
+
+pub trait SelectorFactory<'a, S> {
+    fn selector(self: &'a Self) -> S;
+}
+
+impl<'a, F: Fitness> SelectorFactory<'a, FitnessSelector<'a, F>> for F {
+    fn selector(self: &'a Self) -> FitnessSelector<'a, F> { FitnessSelector::<'a, F> { fitness: self } }
 }
 
 pub struct FitnessSelector<'a, F> {
@@ -54,9 +66,9 @@ impl <'a, F> FitnessSelector<'a, F> {
     pub fn from_fitness(f: &'a F) -> Self { FitnessSelector { fitness: f } }
 }
 
-impl<'a, T: Into<f64> + Clone, F: Fitness<T>> Selector<T> for FitnessSelector<'a, F> {
+impl<'a, T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSelector<'a, F> {
     fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Chromosome<T> {
-        let fitness = chromosomes.iter().map(|c| self.fitness.fitness_value(c));
+        let fitness = chromosomes.iter().map(|c| self.fitness.fitness(c));
         let nfv: Vec<_> =  cascade_sum(invert_normalize(fitness)
             .map(|x| x.abs()).collect());
         

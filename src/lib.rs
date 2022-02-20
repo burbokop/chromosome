@@ -11,6 +11,7 @@ mod selector;
 pub use crate::{
     chromosome::Chromosome,
     selector::Selector,
+    selector::SelectorFactory,
     selector::Fitness,
     selector::FitnessSelector
 };
