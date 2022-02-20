@@ -2,7 +2,7 @@
 name = "chromosome"
 description = "genetic algorithms tools library"
 license= "Apache-2.0"
-version = "0.0.5"
+version = "0.0.6"
 authors = ["borys <burbokop@gmail.com>"]
 edition = "2021"
 
