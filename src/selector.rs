@@ -60,12 +60,9 @@ impl<'a, T: Into<f64> + Clone, F: Fitness<T>> Selector<T> for FitnessSelector<'a
         let nfv: Vec<_> =  cascade_sum(invert_normalize(fitness)
             .map(|x| x.abs()).collect());
         
-        println!("nfv {:?}", nfv);
         for i in 0..nfv.len() - 1 {
             let p: f64 = rng.gen();
-            println!("i: {}, f: {}, p: {}", i, nfv[i], p);
             if p < nfv[i] && if i > 0 { p > nfv[i - 1] } else { true } {
-                println!("yes");
                 return chromosomes[i].clone();
             }
         }
