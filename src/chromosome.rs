@@ -1,7 +1,8 @@
 
 
 use std::{default::Default, ops::Add, ops::Sub};
-use rand::Rng;
+use rand::{Rng, distributions::uniform::{SampleRange, SampleUniform}};
+
 
 /// Chromosome contains genes and provide genetic operations on them
 /// 
@@ -13,6 +14,9 @@ pub struct Chromosome<T> {
 impl<T> Chromosome<T> {
     pub fn new(genes: Vec<T>) -> Self {
         Chromosome { genes }
+    }
+    pub fn new_random<R : rand::RngCore, Range: SampleRange<T> + Clone>(size: usize, range: Range, rng: &mut R) -> Self where T: SampleUniform {
+        Chromosome { genes: (0..size).into_iter().map(|_| rng.gen_range(range.clone())).collect() }
     }
 }
 
@@ -87,3 +91,8 @@ impl<T: std::fmt::Display> std::fmt::Display for Chromosome<T> {
     }
 }
 
+impl<T: std::fmt::Debug> std::fmt::Debug for Chromosome<T> {
+    fn fmt(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::result::Result<(), std::fmt::Error> { 
+        write!(formatter, "Chromosome {:?}", self.genes)
+    }
+}
