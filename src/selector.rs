@@ -24,8 +24,8 @@ mod tests {
 
 pub trait Selector<T> {
     /// select_chromosome - selects not worst chromosomes with some random from vec
-    /// returns tuple (selected chromosome, is the ideal)
     fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Vec<Chromosome<T>>;
+    /// return true if chromosome is ideal (solution of problem)
     fn is_ideal_chromosome(self: &Self, chromosome: &Chromosome<T>) -> bool;
 }
 
@@ -38,6 +38,7 @@ pub trait Fitness {
     fn fitness(self: &Self, chromosome: &Chromosome<Self::Value>) -> Self::Value;
 }
 
+/// SelectorFactory creates selector
 pub trait SelectorFactory<'a, S> {
     fn selector(self: &'a Self) -> S;
 }
@@ -46,6 +47,17 @@ impl<'a, F: Fitness> SelectorFactory<'a, FitnessSelector<'a, F>> for F {
     fn selector(self: &'a Self) -> FitnessSelector<'a, F> { FitnessSelector::<'a, F> { fitness: self } }
 }
 
+/// FitnessSelector selects chromosomes by fitness values
+/// 
+/// Math:
+/// 
+/// S = 1 / f(c0) + 1 / f(c1) + ... + 1 / f(cn)
+/// chances = { 1 / f(c0) / S, 1 / f(c1) / S, ..., 1 / f(cn) / S }
+/// where f is fitness function
+/// 
+/// then selector random select N chromosomes with its select chance
+/// where N is len of input chromosomes vec
+/// 
 pub struct FitnessSelector<'a, F> {
     fitness: &'a F
 }

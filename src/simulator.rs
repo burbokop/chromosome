@@ -16,10 +16,22 @@ fn map_random_pairs<T: Clone, R : rand::RngCore, F: Fn(T, T, &mut R) -> (T, T)>(
     return result;
 }
 
+/// Simulator makes blocking simulation of genetics
+/// returns Chromosome if simulation succesful and solution found and None if no solution
 pub trait Simulator<T, S: Selector<T>> {
     fn simulate<R : rand::RngCore>(self: Self, initial_chromosomes: Vec<Chromosome<T>>, selector: S, rng: &mut R) -> Option<Chromosome<T>>;
 }
 
+/// DefaultSimulator make default simulation
+/// 
+/// Cicle steps:
+/// 1. check if current step chromosomes vec has ideal chromosome (is yes returns Some)
+/// 2. select chromosomes by provided selector
+/// 3. random recombine selected
+/// 4. random mutate recombined
+/// 
+/// if steps count > `iteration_limit` return None
+/// 
 pub struct DefaultSimulator<T> {
     mutation_delta: T,
     mutation_chance: f64,
