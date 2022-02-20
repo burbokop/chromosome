@@ -1,5 +1,5 @@
 [package]
-name = "genetic"
+name = "chromosome"
 description = "genetic algorithms tools library"
 license= "Apache-2.0"
 version = "0.0.5"

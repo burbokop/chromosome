@@ -1,7 +1,7 @@
 use std::iter::Sum;
 
 
-use genetic::{Chromosome, Selector, FitnessSelector, Fitness};
+use chromosome::{Chromosome, Selector, FitnessSelector, Fitness};
 
 
 

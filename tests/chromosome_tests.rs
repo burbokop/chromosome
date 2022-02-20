@@ -1,6 +1,6 @@
 
 
-use genetic::Chromosome;
+use chromosome::Chromosome;
 
 #[test]
 fn recombined_with_test() {

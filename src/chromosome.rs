@@ -24,7 +24,7 @@ impl<T: Clone> Chromosome<T> {
     /// # Examples
     /// 
     /// ```
-    /// use genetic::Chromosome;
+    /// use chromosome::Chromosome;
     /// let result = Chromosome::new(vec![2, 2, 5, 8])
     ///     .recombined_with(&Chromosome::new(vec![1, 5, 4, 3]), 2);
     /// 
@@ -33,7 +33,7 @@ impl<T: Clone> Chromosome<T> {
     /// ```
     /// 
     /// ```
-    /// use genetic::Chromosome;
+    /// use chromosome::Chromosome;
     /// let result = Chromosome::new(vec![1, 1, 1, 1])
     ///     .recombined_with(&Chromosome::new(vec![2, 2, 2, 2]), 1);
     /// 
