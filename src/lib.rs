@@ -1,7 +1,7 @@
 
-//! # Genetic
+//! # Chromosome
 //!
-//! `genetic` - utilities for genetic algorithms
+//! `chromosome` - utilities for genetic algorithms
 
 
 mod chromosome;
