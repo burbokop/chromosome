@@ -22,6 +22,7 @@ mod tests {
     }
 }
 
+/// Genetic selector 
 pub trait Selector<T> {
     /// select_chromosome - selects not worst chromosomes with some random from vec
     fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Vec<Chromosome<T>>;

@@ -17,7 +17,7 @@ fn map_random_pairs<T: Clone, R : rand::RngCore, F: Fn(T, T, &mut R) -> (T, T)>(
 }
 
 /// Simulator makes blocking simulation of genetics
-/// returns Chromosome if simulation succesful and solution found and None if no solution
+/// returns Chromosome if simulation successful and solution found and None if no solution
 pub trait Simulator<T, S: Selector<T>> {
     fn simulate<R : rand::RngCore>(self: Self, initial_chromosomes: Vec<Chromosome<T>>, selector: S, rng: &mut R) -> Option<Chromosome<T>>;
 }
