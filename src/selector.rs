@@ -72,11 +72,18 @@ impl <'a, F> FitnessSelector<'a, F> {
     pub fn from_fitness(f: &'a F) -> Self { FitnessSelector { fitness: f } }
 }
 
+fn abs64(v: f64) -> f64 {
+    #[cfg(feature = "std")]
+    { v.abs() }
+    #[cfg(not(feature = "std"))]
+    if v >= 0. { v } else { -v }
+}
+
 impl<'a, T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSelector<'a, F> {
     fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Vec<Chromosome<T>> {
         let fitness = chromosomes.iter().map(|c| self.fitness.fitness(c));
         let nfv =  cascade_sum(invert_normalize(fitness)
-            .map(|x| x.abs()).collect());
+            .map(|x| abs64(x)).collect());
 
         let mut result: Vec<Chromosome<T>> = Vec::with_capacity(chromosomes.len());
         while result.len() < chromosomes.len() {

@@ -8,6 +8,9 @@
 #[macro_use]
 extern crate alloc;
 
+#[cfg(feature = "std")]
+extern crate std;
+
 mod chromosome;
 mod selector;
 mod simulator;
