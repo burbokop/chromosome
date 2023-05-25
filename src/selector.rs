@@ -1,9 +1,12 @@
+use alloc::vec::Vec;
 
-
-use crate::{chromosome::Chromosome, cascade_sum::cascade_sum};
+use crate::{
+    chromosome::Chromosome,
+    cascade_sum::cascade_sum
+};
 
 fn invert_normalize<T, I: Iterator<Item=T>>(values: I) -> impl Iterator<Item=f64>
-    where 
+    where
     T: Into<f64> + Clone,
     I: Clone {
     let coefficients = values
@@ -15,6 +18,8 @@ fn invert_normalize<T, I: Iterator<Item=T>>(values: I) -> impl Iterator<Item=f64
 
 #[cfg(test)]
 mod tests {
+    use alloc::vec::Vec;
+
     #[test]
     fn invert_normalize_test() {
         use crate::selector::invert_normalize;
@@ -22,7 +27,7 @@ mod tests {
     }
 }
 
-/// Genetic selector 
+/// Genetic selector
 pub trait Selector<T> {
     /// select_chromosome - selects not worst chromosomes with some random from vec
     fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Vec<Chromosome<T>>;
@@ -31,9 +36,9 @@ pub trait Selector<T> {
 }
 
 /// Fitness trait provides interface for finging fitness value for chromosome
-/// 
+///
 /// fitness value - the smaller it is, the closer the chromosome is to the ideal (more adapted). if 0 is an ideal chromosome (solution of the problem)
-/// 
+///
 pub trait Fitness {
     type Value;
     fn fitness(self: &Self, chromosome: &Chromosome<Self::Value>) -> Self::Value;
@@ -49,16 +54,16 @@ impl<'a, F: Fitness> SelectorFactory<'a, FitnessSelector<'a, F>> for F {
 }
 
 /// FitnessSelector selects chromosomes by fitness values
-/// 
+///
 /// Math:
-/// 
+///
 /// S = 1 / f(c0) + 1 / f(c1) + ... + 1 / f(cn)
 /// chances = { 1 / f(c0) / S, 1 / f(c1) / S, ..., 1 / f(cn) / S }
 /// where f is fitness function
-/// 
+///
 /// then selector random select N chromosomes with its select chance
 /// where N is len of input chromosomes vec
-/// 
+///
 pub struct FitnessSelector<'a, F> {
     fitness: &'a F
 }
@@ -72,7 +77,7 @@ impl<'a, T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSel
         let fitness = chromosomes.iter().map(|c| self.fitness.fitness(c));
         let nfv =  cascade_sum(invert_normalize(fitness)
             .map(|x| x.abs()).collect());
-        
+
         let mut result: Vec<Chromosome<T>> = Vec::with_capacity(chromosomes.len());
         while result.len() < chromosomes.len() {
             match nfv.random_index(rng) {
@@ -83,4 +88,4 @@ impl<'a, T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSel
         result
     }
     fn is_ideal_chromosome(self: &Self, chromosome: &Chromosome<T>) -> bool { self.fitness.fitness(chromosome).into() == 0_f64 }
-}            
+}

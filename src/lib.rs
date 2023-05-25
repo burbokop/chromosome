@@ -3,6 +3,10 @@
 //!
 //! `chromosome` - utilities for genetic algorithms
 
+#![no_std]
+
+#[macro_use]
+extern crate alloc;
 
 mod chromosome;
 mod selector;

@@ -1,3 +1,5 @@
+
+use alloc::vec::Vec;
 use rand::Rng;
 
 pub(crate) struct CascadeSum {
@@ -17,7 +19,7 @@ pub(crate) fn cascade_sum(vec: Vec<f64>) -> CascadeSum {
 impl CascadeSum {
     pub(crate) fn random_index<R : rand::RngCore>(self: &Self, rng: &mut R) -> Option<usize> {
         if self.vec.len() > 0 {
-            let p: f64 = rng.gen();            
+            let p: f64 = rng.gen();
             for i in 0..self.vec.len() - 1 {
                 if p < self.vec[i] && if i > 0 { p > self.vec[i - 1] } else { true } {
                     return Some(i);
@@ -27,6 +29,7 @@ impl CascadeSum {
         } else { None }
     }
 
+    #[warn(dead_code)]
     pub(crate) fn generate_average<R : rand::RngCore>(self: &Self, size: usize, rng: &mut R) -> Vec<f64> {
         let mut meetings = vec![0; self.vec.len()];
         let mut cnt = 0;

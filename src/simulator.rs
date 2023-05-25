@@ -1,10 +1,13 @@
+use core::{
+    cmp::Ordering::{Less, Greater},
+    ops::{Sub, Add}
+};
 
-
+use alloc::vec::Vec;
 use rand::Rng;
 
 use crate::selector::Selector;
 use crate::chromosome::Chromosome;
-use std::{cmp::Ordering::{Less, Greater}, ops::{Sub, Add}};
 
 fn map_random_pairs<T: Clone, R : rand::RngCore, F: Fn(T, T, &mut R) -> (T, T)>(vec: Vec<T>, f: F, rng: &mut R) -> Vec<T> {
     let mut result = vec;
@@ -23,15 +26,15 @@ pub trait Simulator<T, S: Selector<T>> {
 }
 
 /// DefaultSimulator make default simulation
-/// 
+///
 /// Cicle steps:
 /// 1. check if current step chromosomes vec has ideal chromosome (is yes returns Some)
 /// 2. select chromosomes by provided selector
 /// 3. random recombine selected
 /// 4. random mutate recombined
-/// 
+///
 /// if steps count > `iteration_limit` return None
-/// 
+///
 pub struct DefaultSimulator<T> {
     mutation_delta: T,
     mutation_chance: f64,
@@ -42,9 +45,9 @@ impl<T> DefaultSimulator<T> {
     pub fn new(
         mutation_delta: T,
         mutation_chance: f64,
-        iteration_limit: usize    
+        iteration_limit: usize
     ) -> Self {
-        DefaultSimulator { 
+        DefaultSimulator {
             mutation_delta: mutation_delta,
             mutation_chance: mutation_chance,
             iteration_limit: iteration_limit
