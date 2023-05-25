@@ -1,7 +1,12 @@
 
 //! # Chromosome
 //!
-//! `chromosome` - utilities for genetic algorithms
+//! Utilities for genetic algorithms
+//!
+//! # Example
+//!```
+#![doc = include_str!("../tests/diophantus_equation.rs")]
+//!```
 
 #![no_std]
 
