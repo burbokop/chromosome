@@ -58,7 +58,7 @@ impl<T> DefaultSimulator<T> {
 impl<T: Clone + Add<Output = T> + Sub<Output = T>, S: Selector<T>> Simulator<T, S> for DefaultSimulator<T> {
     fn simulate<R : rand::RngCore>(self: Self, initial_chromosomes: Vec<Chromosome<T>>, selector: S, rng: &mut R) -> Option<Chromosome<T>> {
         let mut chromosomes: Vec<Chromosome<T>> = initial_chromosomes;
-        for i in 0..self.iteration_limit {
+        for _i in 0..self.iteration_limit {
             let ideal= chromosomes.iter().find(|c| selector.is_ideal_chromosome(c));
             if ideal.is_some() { return ideal.cloned(); }
 
