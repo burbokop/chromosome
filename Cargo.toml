@@ -1,9 +1,13 @@
 [package]
 name = "chromosome"
-description = "genetic algorithms tools library"
+description = "Genetic algorithm tools library"
 license= "MIT"
-version = "0.0.9"
-authors = ["borys <burbokop@gmail.com>"]
+version = "0.0.10"
+authors = [ "borys <burbokop@gmail.com>" ]
+readme = "README.md"
+repository = "https://github.com/burbokop/chromosome"
+documentation = "https://docs.rs/chromosome"
+keywords = [ "chromosome", "genetic", "genetic algorithm" ]
 edition = "2021"
 
 [features]
