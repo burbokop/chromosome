@@ -1,20 +1,16 @@
 use alloc::vec::Vec;
 
-use crate::{
-    chromosome::Chromosome,
-    cascade_sum::cascade_sum
-};
+use crate::{cascade_sum::cascade_sum, chromosome::Chromosome};
 
-fn invert_normalize<T, I: Iterator<Item=T>>(values: I) -> impl Iterator<Item=f64>
-    where
+fn invert_normalize<T, I: Iterator<Item = T>>(values: I) -> impl Iterator<Item = f64>
+where
     T: Into<f64> + Clone,
-    I: Clone {
-    let coefficients = values
-        .map(|v| -> f64 { 1_f64 / v.clone().into() });
+    I: Clone,
+{
+    let coefficients = values.map(|v| -> f64 { 1_f64 / v.clone().into() });
     let sum: f64 = coefficients.clone().sum();
     coefficients.map(move |v| v / sum)
 }
-
 
 #[cfg(test)]
 mod tests {
@@ -23,14 +19,21 @@ mod tests {
     #[test]
     fn invert_normalize_test() {
         use crate::selector::invert_normalize;
-        assert_eq!(invert_normalize(vec![2, 4, 8, 8].into_iter()).collect::<Vec<_>>(), vec![0.5, 0.25, 0.125, 0.125]);
+        assert_eq!(
+            invert_normalize(vec![2, 4, 8, 8].into_iter()).collect::<Vec<_>>(),
+            vec![0.5, 0.25, 0.125, 0.125]
+        );
     }
 }
 
 /// Genetic selector
 pub trait Selector<T> {
     /// select_chromosome - selects not worst chromosomes with some random from vec
-    fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Vec<Chromosome<T>>;
+    fn select_chromosome<R: rand::RngCore>(
+        self: &Self,
+        chromosomes: &Vec<Chromosome<T>>,
+        rng: &mut R,
+    ) -> Vec<Chromosome<T>>;
     /// return true if chromosome is ideal (solution of problem)
     fn is_ideal_chromosome(self: &Self, chromosome: &Chromosome<T>) -> bool;
 }
@@ -44,15 +47,6 @@ pub trait Fitness {
     fn fitness(self: &Self, chromosome: &Chromosome<Self::Value>) -> Self::Value;
 }
 
-/// SelectorFactory creates selector
-pub trait SelectorFactory<'a, S> {
-    fn selector(self: &'a Self) -> S;
-}
-
-impl<'a, F: Fitness> SelectorFactory<'a, FitnessSelector<'a, F>> for F {
-    fn selector(self: &'a Self) -> FitnessSelector<'a, F> { FitnessSelector::<'a, F> { fitness: self } }
-}
-
 /// FitnessSelector selects chromosomes by fitness values
 ///
 /// Math:
@@ -64,26 +58,37 @@ impl<'a, F: Fitness> SelectorFactory<'a, FitnessSelector<'a, F>> for F {
 /// then selector random select N chromosomes with its select chance
 /// where N is len of input chromosomes vec
 ///
-pub struct FitnessSelector<'a, F> {
-    fitness: &'a F
+pub struct FitnessSelector<F> {
+    fitness: F,
 }
 
-impl <'a, F> FitnessSelector<'a, F> {
-    pub fn from_fitness(f: &'a F) -> Self { FitnessSelector { fitness: f } }
+impl<F: Fitness> From<F> for FitnessSelector<F> {
+    fn from(value: F) -> Self {
+        FitnessSelector { fitness: value }
+    }
 }
 
 fn abs64(v: f64) -> f64 {
     #[cfg(feature = "std")]
-    { v.abs() }
+    {
+        v.abs()
+    }
     #[cfg(not(feature = "std"))]
-    if v >= 0. { v } else { -v }
+    if v >= 0. {
+        v
+    } else {
+        -v
+    }
 }
 
-impl<'a, T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSelector<'a, F> {
-    fn select_chromosome<R : rand::RngCore>(self: &Self, chromosomes: &Vec<Chromosome<T>>, rng: &mut R) -> Vec<Chromosome<T>> {
+impl<T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSelector<F> {
+    fn select_chromosome<R: rand::RngCore>(
+        self: &Self,
+        chromosomes: &Vec<Chromosome<T>>,
+        rng: &mut R,
+    ) -> Vec<Chromosome<T>> {
         let fitness = chromosomes.iter().map(|c| self.fitness.fitness(c));
-        let nfv =  cascade_sum(invert_normalize(fitness)
-            .map(|x| abs64(x)).collect());
+        let nfv = cascade_sum(invert_normalize(fitness).map(|x| abs64(x)).collect());
 
         let mut result: Vec<Chromosome<T>> = Vec::with_capacity(chromosomes.len());
         while result.len() < chromosomes.len() {
@@ -94,5 +99,7 @@ impl<'a, T: Into<f64> + Clone, F: Fitness<Value = T>> Selector<T> for FitnessSel
         }
         result
     }
-    fn is_ideal_chromosome(self: &Self, chromosome: &Chromosome<T>) -> bool { self.fitness.fitness(chromosome).into() == 0_f64 }
+    fn is_ideal_chromosome(self: &Self, chromosome: &Chromosome<T>) -> bool {
+        self.fitness.fitness(chromosome).into() == 0_f64
+    }
 }

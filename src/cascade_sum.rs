@@ -1,9 +1,8 @@
-
 use alloc::vec::Vec;
 use rand::Rng;
 
 pub(crate) struct CascadeSum {
-    vec: Vec<f64>
+    vec: Vec<f64>,
 }
 
 pub(crate) fn cascade_sum(vec: Vec<f64>) -> CascadeSum {
@@ -17,7 +16,7 @@ pub(crate) fn cascade_sum(vec: Vec<f64>) -> CascadeSum {
 }
 
 impl CascadeSum {
-    pub(crate) fn random_index<R : rand::RngCore>(self: &Self, rng: &mut R) -> Option<usize> {
+    pub(crate) fn random_index<R: rand::RngCore>(self: &Self, rng: &mut R) -> Option<usize> {
         if self.vec.len() > 0 {
             let p: f64 = rng.gen();
             for i in 0..self.vec.len() - 1 {
@@ -26,11 +25,17 @@ impl CascadeSum {
                 }
             }
             Some(self.vec.len() - 1)
-        } else { None }
+        } else {
+            None
+        }
     }
 
     #[warn(dead_code)]
-    pub(crate) fn generate_average<R : rand::RngCore>(self: &Self, size: usize, rng: &mut R) -> Vec<f64> {
+    pub(crate) fn generate_average<R: rand::RngCore>(
+        self: &Self,
+        size: usize,
+        rng: &mut R,
+    ) -> Vec<f64> {
         let mut meetings = vec![0; self.vec.len()];
         let mut cnt = 0;
         for _ in 0..size {
@@ -38,12 +43,12 @@ impl CascadeSum {
             meetings[index.unwrap()] += 1;
             cnt += 1;
         }
-        meetings.into_iter().map(|x| f64::from(x) / f64::from(cnt)).collect::<Vec<f64>>()
+        meetings
+            .into_iter()
+            .map(|x| f64::from(x) / f64::from(cnt))
+            .collect::<Vec<f64>>()
     }
 }
-
-
-
 
 #[cfg(test)]
 mod tests {

@@ -1,4 +1,3 @@
-
 //! # Chromosome
 //!
 //! Utilities for genetic algorithms
@@ -16,17 +15,12 @@ extern crate alloc;
 #[cfg(feature = "std")]
 extern crate std;
 
+mod cascade_sum;
 mod chromosome;
 mod selector;
 mod simulator;
-mod cascade_sum;
 
 pub use crate::{
-    chromosome::Chromosome,
-    selector::Selector,
-    selector::SelectorFactory,
-    selector::Fitness,
-    selector::FitnessSelector,
-    simulator::Simulator,
-    simulator::DefaultSimulator
+    chromosome::Chromosome, selector::Fitness, selector::FitnessSelector, selector::Selector,
+    simulator::DefaultSimulator, simulator::Simulator,
 };

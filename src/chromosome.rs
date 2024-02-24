@@ -1,39 +1,43 @@
 use core::{
+    fmt::{self, Debug, Display, Formatter},
     ops::{Add, Sub},
-    fmt::{
-        Display,
-        Debug,
-        Formatter,
-        self
-    }
 };
 
 use alloc::{
+    string::{String, ToString},
     vec::Vec,
-    string::{String, ToString}
 };
 
 use rand::{
+    distributions::uniform::{SampleRange, SampleUniform},
     Rng,
-    distributions::uniform::{
-        SampleRange,
-        SampleUniform
-    }
 };
 
 /// Chromosome contains genes and provide genetic operations on them
 ///
 #[derive(Default, Clone)]
 pub struct Chromosome<T> {
-    pub genes: Vec<T>
+    pub genes: Vec<T>,
 }
 
 impl<T> Chromosome<T> {
     pub fn new(genes: Vec<T>) -> Self {
         Chromosome { genes }
     }
-    pub fn new_random<R : rand::RngCore, Range: SampleRange<T> + Clone>(size: usize, range: Range, rng: &mut R) -> Self where T: SampleUniform {
-        Chromosome { genes: (0..size).into_iter().map(|_| rng.gen_range(range.clone())).collect() }
+    pub fn new_random<R: rand::RngCore, Range: SampleRange<T> + Clone>(
+        size: usize,
+        range: Range,
+        rng: &mut R,
+    ) -> Self
+    where
+        T: SampleUniform,
+    {
+        Chromosome {
+            genes: (0..size)
+                .into_iter()
+                .map(|_| rng.gen_range(range.clone()))
+                .collect(),
+        }
     }
 }
 
@@ -62,11 +66,27 @@ impl<T: Clone> Chromosome<T> {
     /// assert_eq!(result.1.genes, vec![2, 1, 1, 1]);
     /// ```
     ///
-    pub fn recombined_with(self: &Chromosome<T>, that: &Chromosome<T>, point: usize) -> (Chromosome<T>, Chromosome<T>) {
+    pub fn recombined_with(
+        self: &Chromosome<T>,
+        that: &Chromosome<T>,
+        point: usize,
+    ) -> (Chromosome<T>, Chromosome<T>) {
         if point < self.genes.len() && point < that.genes.len() {
             (
-                Chromosome::new(self.genes[..point].iter().cloned().chain(that.genes[point..].iter().cloned()).collect()),
-                Chromosome::new(that.genes[..point].iter().cloned().chain(self.genes[point..].iter().cloned()).collect())
+                Chromosome::new(
+                    self.genes[..point]
+                        .iter()
+                        .cloned()
+                        .chain(that.genes[point..].iter().cloned())
+                        .collect(),
+                ),
+                Chromosome::new(
+                    that.genes[..point]
+                        .iter()
+                        .cloned()
+                        .chain(self.genes[point..].iter().cloned())
+                        .collect(),
+                ),
             )
         } else {
             (self.clone(), that.clone())
@@ -74,24 +94,45 @@ impl<T: Clone> Chromosome<T> {
     }
 
     /// recombined_with make recombination at random point
-    pub fn recombined_random_with<R : rand::RngCore>(self: &Chromosome<T>, that: &Chromosome<T>, rng: &mut R) -> (Chromosome<T>, Chromosome<T>) {
-        self.recombined_with(that, rng.gen_range(0..(core::cmp::min(self.genes.len(), that.genes.len()) - 1)))
+    pub fn recombined_random_with<R: rand::RngCore>(
+        self: &Chromosome<T>,
+        that: &Chromosome<T>,
+        rng: &mut R,
+    ) -> (Chromosome<T>, Chromosome<T>) {
+        self.recombined_with(
+            that,
+            rng.gen_range(0..(core::cmp::min(self.genes.len(), that.genes.len()) - 1)),
+        )
     }
-
 }
 
-impl <T: Add<Output=T> + Sub<Output=T> + Clone> Chromosome<T> {
+impl<T: Add<Output = T> + Sub<Output = T> + Clone> Chromosome<T> {
     /// get random mutated chromosome
-    pub fn mutated<R : rand::RngCore>(self: &Chromosome<T>, delta: T, chance: f64, rng: &mut R) -> Chromosome<T> {
-        Chromosome::new(self.genes.iter().cloned().map(
-            |gene|
-                if rng.gen_bool(chance) {
-                    if rng.gen_bool(0.5) { gene + delta.clone() } else { gene - delta.clone() }
-                } else { gene }
-        ).collect())
+    pub fn mutated<R: rand::RngCore>(
+        self: &Chromosome<T>,
+        delta: T,
+        chance: f64,
+        rng: &mut R,
+    ) -> Chromosome<T> {
+        Chromosome::new(
+            self.genes
+                .iter()
+                .cloned()
+                .map(|gene| {
+                    if rng.gen_bool(chance) {
+                        if rng.gen_bool(0.5) {
+                            gene + delta.clone()
+                        } else {
+                            gene - delta.clone()
+                        }
+                    } else {
+                        gene
+                    }
+                })
+                .collect(),
+        )
     }
 }
-
 
 impl<T: Display> Display for Chromosome<T> {
     fn fmt(&self, formatter: &mut Formatter<'_>) -> Result<(), fmt::Error> {
