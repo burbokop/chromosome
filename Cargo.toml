@@ -2,12 +2,12 @@
 name = "chromosome"
 description = "Genetic algorithm tools library"
 license= "MIT"
-version = "0.0.10"
+version = "0.1.0"
 authors = [ "borys <burbokop@gmail.com>" ]
 readme = "README.md"
 repository = "https://github.com/burbokop/chromosome"
 documentation = "https://docs.rs/chromosome"
-keywords = [ "chromosome", "genetic", "genetic algorithm" ]
+keywords = [ "chromosome", "genetic", "algorithms", "genetic_algorithms", "no_std" ]
 edition = "2021"
 
 [features]
