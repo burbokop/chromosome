@@ -20,7 +20,7 @@ impl<'a, 'b, T> DiophantusEquation<'a, 'b, T> {
     }
 }
 
-impl<'a, 'b, T: Mul<Output = T> + Sum + Sub<Output = T> + Clone> Fitness
+impl<'a, 'b, T: Mul<Output = T> + Sum + Sub<Output = T> + Into<f64> + Clone> Fitness
     for DiophantusEquation<'a, 'b, T>
 {
     type Value = T;
@@ -30,6 +30,10 @@ impl<'a, 'b, T: Mul<Output = T> + Sum + Sub<Output = T> + Clone> Fitness
             .sum::<T>()
             - self.result.clone()
     }
+
+    fn is_ideal_fitness(&self, fitness: Self::Value) -> bool {
+        fitness.into() == 0_f64
+    }
 }
 
 #[test]
@@ -38,7 +42,7 @@ fn diophantus_equation() {
     let coefs = vec![2_i32, 23, 54, 1];
     let equation = DiophantusEquation::new(&coefs, &2);
 
-    let sim_result = DefaultSimulator::new(1, 0.09, 10000).simulate(
+    let sim_result = DefaultSimulator::new(vec![1; 4], 0.09, 10000).simulate(
         vec![
             Chromosome::new_random(equation.coefficients.len(), 0_i32..10, &mut rng),
             Chromosome::new_random(equation.coefficients.len(), 0_i32..10, &mut rng),

@@ -1,6 +1,6 @@
 use core::{
     fmt::{self, Debug, Display, Formatter},
-    ops::{Add, Sub},
+    ops::{Add, Range, Sub},
 };
 
 use alloc::{
@@ -99,18 +99,39 @@ impl<T: Clone> Chromosome<T> {
         that: &Chromosome<T>,
         rng: &mut R,
     ) -> (Chromosome<T>, Chromosome<T>) {
+        let len = core::cmp::min(self.genes.len(), that.genes.len());
         self.recombined_with(
             that,
-            rng.gen_range(0..(core::cmp::min(self.genes.len(), that.genes.len()) - 1)),
+            if len > 1 {
+                rng.gen_range(0..(len - 1))
+            } else {
+                0
+            },
         )
+    }
+}
+
+pub trait Superposition<T> {
+    fn collapse<R: rand::RngCore>(self, rng: &mut R) -> T;
+}
+
+impl<T> Superposition<T> for T {
+    fn collapse<R: rand::RngCore>(self, _: &mut R) -> T {
+        self
+    }
+}
+
+impl<T: SampleUniform + PartialOrd> Superposition<T> for Range<T> {
+    fn collapse<R: rand::RngCore>(self, rng: &mut R) -> T {
+        rng.gen_range(self)
     }
 }
 
 impl<T: Add<Output = T> + Sub<Output = T> + Clone> Chromosome<T> {
     /// get random mutated chromosome
-    pub fn mutated<R: rand::RngCore>(
+    pub fn mutated<D: Superposition<T> + Clone, R: rand::RngCore>(
         self: &Chromosome<T>,
-        delta: T,
+        delta: &[D],
         chance: f64,
         rng: &mut R,
     ) -> Chromosome<T> {
@@ -118,12 +139,13 @@ impl<T: Add<Output = T> + Sub<Output = T> + Clone> Chromosome<T> {
             self.genes
                 .iter()
                 .cloned()
-                .map(|gene| {
+                .enumerate()
+                .map(|(i, gene)| {
                     if rng.gen_bool(chance) {
                         if rng.gen_bool(0.5) {
-                            gene + delta.clone()
+                            gene + delta[i].clone().collapse(rng)
                         } else {
-                            gene - delta.clone()
+                            gene - delta[i].clone().collapse(rng)
                         }
                     } else {
                         gene

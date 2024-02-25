@@ -21,6 +21,7 @@ mod selector;
 mod simulator;
 
 pub use crate::{
-    chromosome::Chromosome, selector::Fitness, selector::FitnessSelector, selector::Selector,
-    simulator::DefaultSimulator, simulator::Simulator,
+    chromosome::Chromosome, chromosome::Superposition, selector::Fitness,
+    selector::FitnessSelector, selector::Selector, simulator::DefaultSimulator,
+    simulator::Simulator,
 };
