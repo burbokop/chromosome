@@ -1,28 +1,8 @@
-use core::{
-    cmp::Ordering::{Greater, Less},
-    ops::{Add, Sub},
-};
-
-use alloc::vec::Vec;
-use rand::Rng;
-
 use crate::chromosome::Chromosome;
+use crate::map_random_pairs;
 use crate::selector::Selector;
-
-fn map_random_pairs<T: Clone, R: rand::RngCore, F: Fn(T, T, &mut R) -> (T, T)>(
-    vec: Vec<T>,
-    f: F,
-    rng: &mut R,
-) -> Vec<T> {
-    let mut result = vec;
-    result.sort_by(|_, _| if rng.gen_bool(0.5) { Less } else { Greater });
-    for i in (0..result.len() - 1).step_by(2) {
-        let (a, b) = f(result[i].clone(), result[i + 1].clone(), rng);
-        result[i] = a;
-        result[i + 1] = b;
-    }
-    result
-}
+use alloc::vec::Vec;
+use core::ops::{Add, Sub};
 
 /// Simulator makes blocking simulation of genetics
 /// returns Chromosome if simulation successful and solution found and None if no solution
