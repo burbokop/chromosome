@@ -8,7 +8,7 @@ readme = "README.md"
 repository = "https://github.com/burbokop/chromosome"
 documentation = "https://docs.rs/chromosome"
 keywords = [ "chromosome", "genetic", "algorithms", "genetic-algorithms", "no-std" ]
-categories = ["genetic-algorithms", "no-std"]
+categories = ["algorithms", "science", "simulation", "no-std"]
 edition = "2021"
 
 [features]
