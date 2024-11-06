@@ -1,10 +1,12 @@
-use std::{
+use core::{
     iter::Sum,
     ops::{Mul, Sub},
 };
 
 use chromosome::Fitness;
 use chromosome::{Chromosome, DefaultSimulator, FitnessSelector, Simulator};
+use rand_pcg::Pcg64;
+use rand_seeder::Seeder;
 
 struct DiophantusEquation<'a, 'b, T> {
     coefficients: &'a Vec<T>,
@@ -38,7 +40,7 @@ impl<'a, 'b, T: Mul<Output = T> + Sum + Sub<Output = T> + Into<f64> + Clone> Fit
 
 #[test]
 fn diophantus_equation() {
-    let mut rng = rand::rngs::OsRng::default();
+    let mut rng: Pcg64 = Seeder::from([23, 87, 85]).make_rng();
     let coefs = vec![2_i32, 23, 54, 1];
     let equation = DiophantusEquation::new(&coefs, &2);
 

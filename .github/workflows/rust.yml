@@ -2,21 +2,44 @@ name: Rust
 
 on:
   push:
-    branches: [ "master" ]
+    branches: [ master ]
   pull_request:
-    branches: [ "master" ]
+    branches: [ master ]
 
 env:
   CARGO_TERM_COLOR: always
 
 jobs:
   build:
-
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Set fail-fast to false to ensure that feedback is delivered for all matrix combinations. Consider changing this to true when your workflow is stable.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-22.04]
+        channel: [1.82.0]
+        features: [default, serde, std, none]
 
     steps:
     - uses: actions/checkout@v3
+
+    - name: Set reusable strings
+      id: strings
+      shell: bash
+      run: |
+        if [ "${{matrix.features}}" = "none" ]
+        then
+          echo "cargo-options=--no-default-features --verbose --release" >> "$GITHUB_OUTPUT"
+        else
+          echo "cargo-options=--no-default-features --features ${{matrix.features}} --verbose" >> "$GITHUB_OUTPUT"
+        fi
+
+    - name: Set channel
+      run: |
+        rustup update
+        rustup default ${{matrix.channel}}
     - name: Build
-      run: cargo build --verbose
+      run: cargo build ${{steps.strings.outputs.cargo-options}}
     - name: Run tests
-      run: cargo test --verbose
+      shell: bash
+      run: cargo test ${{steps.strings.outputs.cargo-options}}

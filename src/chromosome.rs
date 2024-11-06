@@ -12,10 +12,13 @@ use rand::{
     distributions::uniform::{SampleRange, SampleUniform},
     Rng,
 };
+#[cfg(feature = "serde")]
+use serde::{Deserialize, Serialize};
 
 /// Chromosome contains genes and provide genetic operations on them
 ///
 #[derive(Default, Clone)]
+#[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Chromosome<T> {
     pub genes: Vec<T>,
 }

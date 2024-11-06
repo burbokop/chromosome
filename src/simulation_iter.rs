@@ -1,6 +1,6 @@
 use crate::{map_random_pairs, Chromosome, Selector, Superposition};
 use alloc::vec::Vec;
-use std::ops::{Add, Sub};
+use core::ops::{Add, Sub};
 
 /// SimulationIter provides Simulating genetics by iterating. each `next()` call produces next generation. `.collect()` gives all generations up to final `ideal` one
 #[derive(Debug)]
