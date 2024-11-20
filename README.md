@@ -1,6 +1,6 @@
 # Chromosome
 
-[![Test Status](https://github.com/burbokop/chromosome/workflows/Rust/badge.svg?event=push)](https://github.com/burbokop/chromosome/actions)
+[![Rust](https://github.com/burbokop/chromosome/actions/workflows/rust.yml/badge.svg)](https://github.com/burbokop/chromosome/actions/workflows/rust.yml)
 [![Crate](https://img.shields.io/crates/v/chromosome.svg)](https://crates.io/crates/chromosome)
 [![API](https://docs.rs/chromosome/badge.svg)](https://docs.rs/chromosome)
 
