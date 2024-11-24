@@ -62,7 +62,13 @@ impl<T: Clone + Add<Output = T> + Sub<Output = T>, S: Selector<T>> Simulator<T, 
                 map_random_pairs(selected, |x, y, z| x.recombined_random_with(&y, z), rng);
             chromosomes = children
                 .into_iter()
-                .map(|c| c.mutated(&self.mutation_delta, self.mutation_chance, rng))
+                .map(|c| {
+                    c.mutated(
+                        |i, _| self.mutation_delta[i].clone(),
+                        self.mutation_chance,
+                        rng,
+                    )
+                })
                 .collect();
         }
         None

@@ -65,7 +65,13 @@ impl<
         );
         self.chromosomes = children
             .into_iter()
-            .map(|c| c.mutated(&self.mutation_delta, self.mutation_chance, &mut self.rng))
+            .map(|c| {
+                c.mutated(
+                    |i, _| self.mutation_delta[i].clone(),
+                    self.mutation_chance,
+                    &mut self.rng,
+                )
+            })
             .collect();
 
         Some(self.chromosomes.clone())
