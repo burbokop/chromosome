@@ -30,7 +30,7 @@ impl CascadeSum {
         }
     }
 
-    #[warn(dead_code)]
+    #[allow(dead_code)]
     pub(crate) fn generate_average<R: rand::RngCore>(
         self: &Self,
         size: usize,
