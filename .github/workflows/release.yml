@@ -23,10 +23,17 @@ jobs:
       - name: Check project version
         shell: bash
         run: |
-          export VERSION=$(cargo metadata --format-version=1 --no-deps | jq '.packages[0].version' | tr -d '"')
-          echo "Version in Cargo.toml: $VERSION"
-          if [[ "v$VERSION" != "${{ github.ref_name }}" ]]; then
-            echo "Cargo.toml version 'v$VERSION' does not match tag '${{ github.ref_name }}'"
+          export CARGO_VERSION=$(cargo metadata --format-version=1 --no-deps | jq '.packages[0].version' | tr -d '"')
+          export README_VERSION=$(cat ./README.md | grep "chromosome = " | cut -d "=" -f2 | tr -d ' "')
+          echo "Version in Cargo.toml: $CARGO_VERSION"
+          echo "Version in README.md: $README_VERSION"
+          if [[ "v$CARGO_VERSION" != "${{ github.ref_name }}" ]]; then
+            echo "Cargo.toml version 'v$CARGO_VERSION' does not match tag '${{ github.ref_name }}'"
+            exit 1
+          fi
+          if [[ "v$README_VERSION" != "${{ github.ref_name }}" ]]; then
+            cat ./README.md | grep -B 2 -A 1 "chromosome = "
+            echo "README.md version 'v$README_VERSION' does not match tag '${{ github.ref_name }}'"
             exit 1
           fi
 

@@ -15,7 +15,7 @@ Add this to your `Cargo.toml`:
 
 ```toml
 [dependencies]
-chromosome = "0.1.1"
+chromosome = "0.1.2"
 ```
 
 ## Example
