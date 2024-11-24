@@ -1,6 +1,6 @@
 # Chromosome
 
-[![Rust](https://github.com/burbokop/chromosome/actions/workflows/rust.yml/badge.svg)](https://github.com/burbokop/chromosome/actions/workflows/rust.yml)
+[![CI](https://github.com/burbokop/chromosome/actions/workflows/ci.yml/badge.svg)](https://github.com/burbokop/chromosome/actions/workflows/ci.yml)
 [![Crate](https://img.shields.io/crates/v/chromosome.svg)](https://crates.io/crates/chromosome)
 [![API](https://docs.rs/chromosome/badge.svg)](https://docs.rs/chromosome)
 

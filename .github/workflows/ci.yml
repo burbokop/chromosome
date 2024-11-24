@@ -1,4 +1,4 @@
-name: Rust
+name: CI
 
 on:
   push:
@@ -21,7 +21,7 @@ jobs:
         features: [default, serde, std, none]
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set reusable strings
       id: strings
@@ -43,3 +43,23 @@ jobs:
     - name: Run tests
       shell: bash
       run: cargo test ${{steps.strings.outputs.cargo-options}}
+
+  check-format:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Rust format
+      run: cargo fmt --
+    - name: Suggest format changes
+      uses: reviewdog/action-suggester@v1
+      with:
+        tool_name: formatters
+        level: error
+        fail_on_error: true
+
+  check-publish-capability:
+    runs-on: ubuntu-22.04
+    steps:
+    - uses: actions/checkout@v4
+    - name: Check publish capability
+      run: cargo publish --dry-run

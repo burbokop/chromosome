@@ -7,6 +7,7 @@
 #![doc = include_str!("../tests/diophantus_equation.rs")]
 //!```
 
+#![deny(warnings)]
 #![no_std]
 
 #[macro_use]
