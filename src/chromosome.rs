@@ -1,6 +1,6 @@
 use core::{
     fmt::{self, Debug, Display, Formatter},
-    ops::{Add, Range, Sub},
+    ops::{Add, AddAssign, Range, Sub, SubAssign},
 };
 
 use alloc::{
@@ -10,13 +10,13 @@ use alloc::{
 
 use rand::{
     distributions::uniform::{SampleRange, SampleUniform},
-    Rng,
+    Rng, RngCore,
 };
+
 #[cfg(feature = "serde")]
 use serde::{Deserialize, Serialize};
 
 /// Chromosome contains genes and provide genetic operations on them
-///
 #[derive(Default, Clone)]
 #[cfg_attr(feature = "serde", derive(Serialize, Deserialize))]
 pub struct Chromosome<T> {
@@ -24,9 +24,12 @@ pub struct Chromosome<T> {
 }
 
 impl<T> Chromosome<T> {
+    #[inline]
     pub fn new(genes: Vec<T>) -> Self {
         Chromosome { genes }
     }
+
+    #[inline]
     pub fn new_random<R: rand::RngCore, Range: SampleRange<T> + Clone>(
         size: usize,
         range: Range,
@@ -42,9 +45,7 @@ impl<T> Chromosome<T> {
                 .collect(),
         }
     }
-}
 
-impl<T: Clone> Chromosome<T> {
     /// recombined_with make recombination at specific point
     ///
     ///
@@ -69,11 +70,15 @@ impl<T: Clone> Chromosome<T> {
     /// assert_eq!(result.1.genes, vec![2, 1, 1, 1]);
     /// ```
     ///
+    #[inline]
     pub fn recombined_with(
         self: &Chromosome<T>,
         that: &Chromosome<T>,
         point: usize,
-    ) -> (Chromosome<T>, Chromosome<T>) {
+    ) -> (Chromosome<T>, Chromosome<T>)
+    where
+        T: Clone,
+    {
         if point < self.genes.len() && point < that.genes.len() {
             (
                 Chromosome::new(
@@ -97,11 +102,16 @@ impl<T: Clone> Chromosome<T> {
     }
 
     /// recombined_with make recombination at random point
-    pub fn recombined_random_with<R: rand::RngCore>(
+    #[inline]
+    pub fn recombined_random_with<R>(
         self: &Chromosome<T>,
         that: &Chromosome<T>,
         rng: &mut R,
-    ) -> (Chromosome<T>, Chromosome<T>) {
+    ) -> (Chromosome<T>, Chromosome<T>)
+    where
+        T: Clone,
+        R: rand::RngCore,
+    {
         let len = core::cmp::min(self.genes.len(), that.genes.len());
         self.recombined_with(
             that,
@@ -111,6 +121,53 @@ impl<T: Clone> Chromosome<T> {
                 0
             },
         )
+    }
+
+    /// get random mutated chromosome
+    #[inline]
+    pub fn mutated<D, F, R>(self: Self, delta: F, chance: f64, rng: &mut R) -> Chromosome<T>
+    where
+        T: Add<Output = T> + Sub<Output = T>,
+        D: Superposition<T>,
+        F: Fn(usize, &mut R) -> D,
+        R: RngCore,
+    {
+        Chromosome::new(
+            self.genes
+                .into_iter()
+                .enumerate()
+                .map(|(i, gene)| {
+                    if rng.gen_bool(chance) {
+                        if rng.gen_bool(0.5) {
+                            gene + delta(i, rng).collapse(rng)
+                        } else {
+                            gene - delta(i, rng).collapse(rng)
+                        }
+                    } else {
+                        gene
+                    }
+                })
+                .collect(),
+        )
+    }
+
+    #[inline]
+    pub fn mutate<D, F, R>(self: &mut Self, delta: F, chance: f64, rng: &mut R)
+    where
+        T: AddAssign + SubAssign,
+        D: Superposition<T>,
+        F: Fn(usize, &mut R) -> D,
+        R: RngCore,
+    {
+        self.genes.iter_mut().enumerate().for_each(|(i, gene)| {
+            if rng.gen_bool(chance) {
+                if rng.gen_bool(0.5) {
+                    *gene += delta(i, rng).collapse(rng);
+                } else {
+                    *gene -= delta(i, rng).collapse(rng);
+                }
+            }
+        })
     }
 }
 
@@ -127,35 +184,6 @@ impl<T> Superposition<T> for T {
 impl<T: SampleUniform + PartialOrd> Superposition<T> for Range<T> {
     fn collapse<R: rand::RngCore>(self, rng: &mut R) -> T {
         rng.gen_range(self)
-    }
-}
-
-impl<T: Add<Output = T> + Sub<Output = T> + Clone> Chromosome<T> {
-    /// get random mutated chromosome
-    pub fn mutated<D: Superposition<T> + Clone, R: rand::RngCore>(
-        self: &Chromosome<T>,
-        delta: &[D],
-        chance: f64,
-        rng: &mut R,
-    ) -> Chromosome<T> {
-        Chromosome::new(
-            self.genes
-                .iter()
-                .cloned()
-                .enumerate()
-                .map(|(i, gene)| {
-                    if rng.gen_bool(chance) {
-                        if rng.gen_bool(0.5) {
-                            gene + delta[i].clone().collapse(rng)
-                        } else {
-                            gene - delta[i].clone().collapse(rng)
-                        }
-                    } else {
-                        gene
-                    }
-                })
-                .collect(),
-        )
     }
 }
 
