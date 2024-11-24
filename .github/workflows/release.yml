@@ -1,0 +1,46 @@
+
+on:
+  push:
+    tags:
+      - v*
+
+name: CMake on multiple platforms (Release)
+
+jobs:
+  build:
+    name: Build
+    uses: burbokop/chromosome/.github/workflows/ci.yml@master
+    secrets:
+      envPAT: ${{ secrets.envPAT }}
+
+  release:
+    name: Release
+    needs: build
+    runs-on: ubuntu-22.04
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check project version
+        shell: bash
+        run: |
+          export VERSION=$(cargo metadata --format-version=1 --no-deps | jq '.packages[0].version' | tr -d '"')
+          echo "Version in Cargo.toml: $VERSION"
+          if [[ "v$VERSION" != "${{ github.ref_name }}" ]]; then
+            echo "Cargo.toml version 'v$VERSION' does not match tag '${{ github.ref_name }}'"
+            exit 1
+          fi
+
+      - name: Publish to crates.io
+        uses: katyo/publish-crates@v2
+        with:
+          registry-token: ${{ secrets.CARGO_REGISTRY_TOKEN }}
+
+      - name: Create Github Release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+          draft: false
+          prerelease: false
