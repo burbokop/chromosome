@@ -18,7 +18,7 @@ pub(crate) fn cascade_sum(vec: Vec<f64>) -> CascadeSum {
 impl CascadeSum {
     pub(crate) fn random_index<R: rand::RngCore>(self: &Self, rng: &mut R) -> Option<usize> {
         if self.vec.len() > 0 {
-            let p: f64 = rng.gen();
+            let p: f64 = rng.random();
             for i in 0..self.vec.len() - 1 {
                 if p < self.vec[i] && if i > 0 { p > self.vec[i - 1] } else { true } {
                     return Some(i);
