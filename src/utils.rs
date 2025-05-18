@@ -8,7 +8,7 @@ pub fn map_random_pairs<T: Clone, R: rand::RngCore, F: Fn(T, T, &mut R) -> (T, T
     rng: &mut R,
 ) -> Vec<T> {
     let mut result = vec;
-    result.sort_by(|_, _| if rng.gen_bool(0.5) { Less } else { Greater });
+    result.sort_by(|_, _| if rng.random_bool(0.5) { Less } else { Greater });
     for i in (0..result.len() - 1).step_by(2) {
         let (a, b) = f(result[i].clone(), result[i + 1].clone(), rng);
         result[i] = a;

@@ -40,7 +40,7 @@ impl<'a, 'b, T: Mul<Output = T> + Sum + Sub<Output = T> + Into<f64> + Clone> Fit
 
 #[test]
 fn diophantus_equation() {
-    let mut rng: Pcg64 = Seeder::from([23, 87, 85]).make_rng();
+    let mut rng: Pcg64 = Seeder::from([23, 87, 85]).into_rng();
     let coefs = vec![2_i32, 23, 54, 1];
     let equation = DiophantusEquation::new(&coefs, &2);
 

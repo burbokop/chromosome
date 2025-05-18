@@ -9,7 +9,7 @@ use alloc::{
 };
 
 use rand::{
-    distributions::uniform::{SampleRange, SampleUniform},
+    distr::uniform::{SampleRange, SampleUniform},
     Rng, RngCore,
 };
 
@@ -41,7 +41,7 @@ impl<T> Chromosome<T> {
         Chromosome {
             genes: (0..size)
                 .into_iter()
-                .map(|_| rng.gen_range(range.clone()))
+                .map(|_| rng.random_range(range.clone()))
                 .collect(),
         }
     }
@@ -116,7 +116,7 @@ impl<T> Chromosome<T> {
         self.recombined_with(
             that,
             if len > 1 {
-                rng.gen_range(0..(len - 1))
+                rng.random_range(0..(len - 1))
             } else {
                 0
             },
@@ -137,8 +137,8 @@ impl<T> Chromosome<T> {
                 .into_iter()
                 .enumerate()
                 .map(|(i, gene)| {
-                    if rng.gen_bool(chance) {
-                        if rng.gen_bool(0.5) {
+                    if rng.random_bool(chance) {
+                        if rng.random_bool(0.5) {
                             gene + delta(i, rng).collapse(rng)
                         } else {
                             gene - delta(i, rng).collapse(rng)
@@ -160,8 +160,8 @@ impl<T> Chromosome<T> {
         R: RngCore,
     {
         self.genes.iter_mut().enumerate().for_each(|(i, gene)| {
-            if rng.gen_bool(chance) {
-                if rng.gen_bool(0.5) {
+            if rng.random_bool(chance) {
+                if rng.random_bool(0.5) {
                     *gene += delta(i, rng).collapse(rng);
                 } else {
                     *gene -= delta(i, rng).collapse(rng);
@@ -183,7 +183,7 @@ impl<T> Superposition<T> for T {
 
 impl<T: SampleUniform + PartialOrd> Superposition<T> for Range<T> {
     fn collapse<R: rand::RngCore>(self, rng: &mut R) -> T {
-        rng.gen_range(self)
+        rng.random_range(self)
     }
 }
 
