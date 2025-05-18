@@ -23,7 +23,7 @@ jobs:
       fail-fast: false
       matrix:
         os: [ubuntu-22.04]
-        channel: [1.82.0]
+        channel: [1.82.0, 1.85.0, 1.87.0]
         features: [default, serde, std, none]
 
     steps:
